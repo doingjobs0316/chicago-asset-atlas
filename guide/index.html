@@ -1,0 +1,303 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Asset Atlas Guide</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito+Sans:opsz,wght@6..12,400;6..12,600;6..12,700;6..12,800&display=swap">
+<meta name="description" content="How to use Chicago’s Asset Atlas: the live map, adding a place, and the admin page for the Goldin team.">
+<link rel="icon" href="../brand/goldin-icon.png">
+<style>
+/* the reset an Artifact page gets from its host */
+:root { color-scheme: light } body { margin: 0 } img { max-width: 100% } [hidden] { display: none !important }
+/* Layout: one reading column; each step is a short text block beside (or above, on phones) its screenshot.
+   Colors and type follow the site itself: Goldin orange, GI black, Nunito Sans with 800-weight headings. */
+:root {
+  --bg: #F4F3F1; --surface: #FFFFFF; --fg: #0A1216; --muted: #545454; --line: #E3E1DE;
+  --orange: #F37122; --orange-text: #B84A08; --band-fg: #0A1216;
+  --ok: #2E7D32; --ok-bg: #E6F4E7; --wait: #E0A800; --wait-bg: #FFF4D1; --no: #C62828; --no-bg: #FDEAEA;
+  --new: #D3302F; --pin-gray: #545454;
+  --font: "Nunito Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --shadow: 0 1px 2px rgba(10,18,22,.06), 0 6px 20px rgba(10,18,22,.08);
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0E1316; --surface: #181D21; --fg: #EDEDED; --muted: #A8ADB0; --line: #2A3034; --orange-text: #FF9A5C;
+  --ok-bg: #1D3320; --wait-bg: #3A3010; --no-bg: #3B1C1C; --shadow: 0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35); color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #0E1316; --surface: #181D21; --fg: #EDEDED; --muted: #A8ADB0; --line: #2A3034; --orange-text: #FF9A5C;
+  --ok-bg: #1D3320; --wait-bg: #3A3010; --no-bg: #3B1C1C; --shadow: 0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35); color-scheme: dark }
+
+* { box-sizing: border-box }
+body { background: var(--bg); color: var(--fg); font: 17px/1.6 var(--font); }
+a { color: var(--orange-text); font-weight: 700 }
+a:focus-visible { outline: 2px solid var(--orange); outline-offset: 2px }
+h1, h2, h3 { font-weight: 800; line-height: 1.15; text-wrap: balance; margin: 0 }
+p { margin: 0 }
+.wrap { max-width: 1040px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)) }
+
+/* the orange band, as on the site */
+.band { background: var(--orange); color: var(--band-fg); clip-path: polygon(0 0, 100% 0, 100% calc(100% - 22px), 50% 100%, 0 calc(100% - 22px)) }
+.band .wrap { padding-block: 40px 62px; display: grid; gap: 10px }
+.band h1 { font-size: clamp(34px, 6vw, 54px); letter-spacing: -.015em }
+.band p { font-size: 19px; max-width: 46ch }
+.band .links { display: flex; flex-wrap: wrap; gap: 8px 22px; margin-top: 6px; font-weight: 700 }
+.band .links a { color: var(--band-fg) }
+
+main.wrap { padding-block: 40px 72px; display: grid; gap: 64px }
+.part { display: grid; gap: 28px }
+.part > header { display: grid; gap: 6px; padding-bottom: 14px; border-bottom: 3px solid var(--orange) }
+.part > header h2 { font-size: 32px }
+.part > header p { color: var(--muted); max-width: 60ch }
+.who { font-weight: 700; color: var(--orange-text); font-size: 15px; letter-spacing: .04em; text-transform: uppercase }
+
+.step { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 28px; align-items: start }
+.step .text { display: grid; gap: 10px; min-width: 0 }
+.step h3 { font-size: 23px }
+.step ul, .step ol { margin: 0; padding-left: 1.2em; display: grid; gap: 6px }
+.step li::marker { color: var(--orange-text); font-weight: 800 }
+.shot { margin: 0; display: grid; gap: 8px; min-width: 0 }
+.shot img { display: block; width: 100%; height: auto; border-radius: 12px; box-shadow: var(--shadow); border: 1px solid var(--line) }
+.shot figcaption { font-size: 14px; color: var(--muted) }
+.phones { display: grid; grid-template-columns: 1fr 1fr; gap: 16px }
+.crop-top img { aspect-ratio: 2560 / 1280; object-fit: cover; object-position: top }
+.crop-login img { aspect-ratio: 1; height: auto; object-fit: cover; object-position: center; max-width: 360px }
+@media (max-width: 760px) { .step { grid-template-columns: minmax(0, 1fr); gap: 16px } }
+
+/* pin key */
+.pins { display: grid; gap: 12px; margin: 0; padding: 18px; list-style: none; background: var(--surface); border: 1px solid var(--line); border-radius: 12px }
+.pins li { display: grid; grid-template-columns: 34px 1fr; gap: 12px; align-items: center; font-size: 16px; line-height: 1.35 }
+.pin { width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; border: 2.5px solid #fff; box-shadow: 0 1px 4px rgba(0,0,0,.35) }
+.pin img { width: 70%; height: 70% }
+.pin svg { width: 58%; height: 58% }
+.pin.hex { border-radius: 0; border: 0; box-shadow: none; background: none }
+.pin.hex img { width: 30px; height: 30px; filter: drop-shadow(0 1px 2px rgba(0,0,0,.35)) }
+.pin.new { background: #fff; border-color: var(--new) }
+.pin.new img { filter: brightness(0) invert(.33) }
+.pins .new-row { padding-top: 12px; border-top: 1px solid var(--line); font-weight: 700 }
+
+/* drawn bits of the admin page */
+.mock { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; box-shadow: var(--shadow) }
+.row { display: grid; grid-template-columns: 1fr auto; gap: 12px; align-items: center; padding: 14px 18px; border-left: 6px solid; border-top: 1px solid var(--line); background: var(--surface) }
+.row:first-child { border-top: 0 }
+.row strong { display: block; font-size: 17px }
+.row span.sub { font-size: 14px; color: var(--muted) }
+.row.wait { border-left-color: var(--wait); background: var(--wait-bg) }
+.row.ok { border-left-color: var(--ok) }
+.row.no { border-left-color: var(--no); background: var(--no-bg) }
+.tag { font-size: 14px; font-weight: 700; padding: 2px 10px; border-radius: 6px; white-space: nowrap }
+.wait .tag { background: var(--wait-bg); color: #7A5800; border: 1px solid var(--wait) }
+.ok .tag { background: var(--ok-bg); color: var(--ok) }
+.no .tag { background: var(--no-bg); color: var(--no); border: 1px solid var(--no) }
+:root[data-theme="dark"] .wait .tag { color: #F2C94C }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .wait .tag { color: #F2C94C } }
+.buttons { display: flex; flex-wrap: wrap; gap: 10px; padding: 16px 18px; background: var(--surface); border: 1px solid var(--line); border-radius: 12px }
+.btn { font: 700 15px/1 var(--font); padding: 10px 16px; border-radius: 999px; border: 1.5px solid transparent }
+.btn.approve { background: var(--ok); color: #fff }
+.btn.reject { background: var(--no); color: #fff }
+.btn.back { border-color: var(--muted); color: var(--fg) }
+.btn.delete { border-color: var(--no); color: var(--no) }
+.note { padding: 16px 18px; border-radius: 12px; background: var(--surface); border: 1px solid var(--line); display: grid; gap: 6px }
+.note strong { font-weight: 800 }
+.signin { display: grid; grid-template-columns: max-content 1fr; gap: 6px 16px; margin: 0; padding: 16px 18px; background: var(--surface); border: 1px solid var(--line); border-radius: 12px }
+.signin dt { color: var(--muted) }
+.signin dd { margin: 0; font-weight: 700; overflow-wrap: anywhere }
+footer.wrap { padding-block: 0 48px; color: var(--muted); font-size: 14px }
+@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto } }
+</style>
+</head>
+<body>
+<section class="band">
+  <div class="wrap">
+    <h1>Chicago’s Asset Atlas</h1>
+    <p>A quick guide to the live map and to the admin page where the Goldin team checks new places.</p>
+    <nav class="links" aria-label="Parts of this guide">
+      <a href="#map">The map</a><a href="#add">Adding a place</a><a href="#admin">The admin page</a>
+    </nav>
+  </div>
+</section>
+
+<main class="wrap">
+
+  <!-- ── part 1: the map ─────────────────────────────────────────────────────── -->
+  <section class="part" id="map">
+    <header>
+      <span class="who">For everyone</span>
+      <h2>The map</h2>
+      <p>Open <a href="https://chicagoassetatlas.org">chicagoassetatlas.org</a>. Nothing to install, no account needed.</p>
+    </header>
+
+    <div class="step">
+      <div class="text">
+        <h3>Look around</h3>
+        <ul>
+          <li><b>Switches</b> turn each kind of place on or off: Peace Fellows, Other resources, Gems, Schools, Parks and Ward offices.</li>
+          <li><b>Neighborhood</b> zooms to one community area.</li>
+          <li><b>Gem types</b> show only the gems you pick.</li>
+          <li><b>List</b> shows everything as cards. <b>Español</b> switches the language.</li>
+        </ul>
+      </div>
+      <figure class="shot"><img src="img/map.jpg" alt="The Asset Atlas map of Chicago with the filter bar across the top" width="2560" height="1640"><figcaption>The map, with the filters along the top.</figcaption></figure>
+    </div>
+
+    <div class="step">
+      <div class="text">
+        <h3>Open a place</h3>
+        <ul>
+          <li><b>Click a pin</b> to see its card: what it does, address, website, and who leads it.</li>
+          <li><b>Double-click a neighborhood</b> to open it in 3D with its buildings. The box at the bottom counts what’s there.</li>
+          <li><b>Share</b> on a card copies a link straight to that place.</li>
+        </ul>
+      </div>
+      <figure class="shot"><img src="img/card.jpg" alt="A place's card open on the left, East Garfield Park shown in 3D" width="2560" height="1640"><figcaption>Peace Runners 773, in East Garfield Park.</figcaption></figure>
+    </div>
+
+    <div class="step">
+      <div class="text">
+        <h3>What the pins mean</h3>
+        <p>The <b>ⓘ</b> button at the end of the switches shows this key on the map too.</p>
+      </div>
+        <ul class="pins">
+          <li><span class="pin" style="background:#fff"><img src="img/peace-fellows-icon.png" alt=""></span>Peace Fellows organization, 2019 to 2025 cohorts</li>
+          <li><span class="pin hex"><img src="img/gather-icon.png" alt=""></span>Peace Fellows organization, 2026 cohort</li>
+          <li><span class="pin" style="background:#545454"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#fff" d="m14.5,11l3.84-4.1c.41-.41.66-.98.66-1.62s-.25-1.2-.66-1.62c-.41-.41-.97-.67-1.59-.67,0,0-1.12,0-2.25,1.14-1.13-1.15-2.25-1.14-2.25-1.14-.62,0-1.18.26-1.59.67-.41.41-.66.99-.66,1.62s.25,1.2.66,1.62l3.84,4.1Z"/><path fill="#fff" d="m20.47,12.49l-.17-.06c-.8-.27-1.69-.11-2.35.42l-3.94,3.15h-5v-1h4.07c.4,0,.64-.45.42-.78l-1.18-1.78c-.19-.28-.5-.45-.83-.45H3c-.55,0-1,.45-1,1v6c0,.55.45,1,1,1h10.76c.8,0,1.56-.32,2.12-.88l4.98-4.98c.53-.53.31-1.42-.39-1.66Z"/></svg></span>Other resource: a community organization or service</li>
+          <li><span class="pin" style="background:#E2B84B;border-color:#0A1216"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#0A1216" d="m14,2h-2v7h-2V2h-2v7h-2V2h-2v8c0,1.65,1.35,3,3,3h1v9h2v-9h1c1.65,0,3-1.35,3-3V2Z"/><path fill="#0A1216" d="m17,13h1v9h2V3c0-.55-.45-1-1-1-1.65,0-3,1.35-3,3v7c0,.55.45,1,1,1Z"/></svg></span>Gem: a public place; the color and icon show its type (food, art, outdoors…)</li>
+          <li class="new-row"><span class="pin new"><img src="img/peace-fellows-icon.png" alt=""></span>Red outline: just added, not reviewed yet</li>
+        </ul>
+    </div>
+
+    <div class="step">
+      <div class="text">
+        <h3>Watch the network grow</h3>
+        <p><b>Timeline</b> plays the Peace Fellows organizations appearing cohort by cohort, from 2019 to 2026. Drag the slider to any year. <b>Back to filters</b> closes it.</p>
+      </div>
+      <figure class="shot"><img src="img/timeline.jpg" alt="The cohort timeline playing over the map, at 2022" width="2560" height="1640"><figcaption>The timeline at 2022.</figcaption></figure>
+    </div>
+
+    <div class="step">
+      <div class="text">
+        <h3>On a phone</h3>
+        <p>The filters fold away behind a <b>Filters</b> button over the map, so the map has more room. Tap it to change what shows, then tap <b>Done</b>.</p>
+      </div>
+      <div class="phones">
+        <figure class="shot"><img src="img/phone.jpg" alt="The map on a phone with a Filters button" width="780" height="1688"><figcaption>Filters closed</figcaption></figure>
+        <figure class="shot"><img src="img/phone-filters.jpg" alt="The filters open over the map on a phone" width="780" height="1688"><figcaption>Filters open</figcaption></figure>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── adding a place ──────────────────────────────────────────────────────── -->
+  <section class="part" id="add">
+    <header>
+      <span class="who">For everyone</span>
+      <h2>Adding a place</h2>
+      <p>Click <b>Add to the map</b> at the top of the site. A new place shows on the map right away with a red outline, until the Goldin team checks it.</p>
+    </header>
+
+    <div class="step">
+      <div class="text">
+        <h3>Choose what to add</h3>
+        <ul>
+          <li><b>An organization.</b> The form asks “Are you a Goldin fellow?”. Yes: pick your cohort year. No: pick what kind of organization it is.</li>
+          <li><b>A neighborhood gem.</b> A restaurant, mural, park, historic place or community space. Anyone can suggest one.</li>
+        </ul>
+      </div>
+      <figure class="shot crop-top"><img src="img/add.jpg" alt="The Add to the map page with two choices: An organization, A neighborhood gem" width="2560" height="1640"></figure>
+    </div>
+
+    <div class="step">
+      <div class="text">
+        <h3>Pick the address</h3>
+        <ol>
+          <li>Start typing the address or the place’s name.</li>
+          <li>Pick it from the suggestions that appear.</li>
+          <li>Check the pin on the small map below.</li>
+        </ol>
+        <p>Not in the suggestions? Type it in anyway, and the Goldin team places the pin when they check it.</p>
+      </div>
+      <figure class="shot"><img src="img/address.jpg" alt="The address field filled in, with a pin on a small map below" width="1720" height="993"></figure>
+    </div>
+
+    <div class="step">
+      <div class="text">
+        <h3>Send, then see it</h3>
+        <p>After you send it, <b>See it on the map</b> takes you straight to your new place.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── part 2: admin ───────────────────────────────────────────────────────── -->
+  <section class="part" id="admin">
+    <header>
+      <span class="who">For the Goldin team</span>
+      <h2>The admin page</h2>
+      <p>Where you check new places and approve or reject them. Please check every few days: anything people add is visible until you review it.</p>
+    </header>
+
+    <div class="step">
+      <div class="text">
+        <h3>Sign in</h3>
+        <dl class="signin">
+          <dt>Address</dt><dd><a href="https://chicagoassetatlas.org/admin">chicagoassetatlas.org/admin</a></dd>
+          <dt>Username and password</dt><dd>Ask the person who manages the site</dd>
+        </dl>
+        <p>Keep them within the Goldin team. The page remembers you on that computer until you click <b>Sign out</b>.</p>
+      </div>
+      <figure class="shot crop-login"><img src="img/admin-login.jpg" alt="The admin sign-in box with Username and Password" width="2560" height="1640"></figure>
+    </div>
+
+    <div class="step">
+      <div class="text">
+        <h3>Read the colors</h3>
+        <ul>
+          <li><b>Yellow:</b> waiting for review. Shows on the map with a red outline.</li>
+          <li><b>Green:</b> approved. Shows normally.</li>
+          <li><b>Red:</b> rejected. Doesn’t show.</li>
+        </ul>
+        <p>The page opens on <b>Waiting for review</b>, so new places come first. Use the tabs, <b>Kind</b> and <b>Search</b> to find anything else.</p>
+      </div>
+      <div class="mock" role="img" aria-label="Example rows: one yellow waiting, one green approved, one red rejected">
+        <div class="row wait"><div><strong>Corner Garden</strong><span class="sub">Gem · Park or outdoors · sent Nov 18, 2026</span></div><span class="tag">Waiting for review</span></div>
+        <div class="row ok"><div><strong>Peace Runners 773</strong><span class="sub">Peace Fellows organization, 2026 · East Garfield Park</span></div><span class="tag">Approved</span></div>
+        <div class="row no"><div><strong>Test entry</strong><span class="sub">Gem · Restaurant or food</span></div><span class="tag">Rejected</span></div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="text">
+        <h3>Review a place</h3>
+        <ol>
+          <li>Click a yellow row to open it.</li>
+          <li>Check it’s real, it’s in or near Chicago, and it’s a <b>public place</b> (never someone’s home).</li>
+          <li>Look at the pin on the map. Wrong spot? Drag the pin or click where the place is, then <b>Save the pin</b>.</li>
+          <li>Click <b>Approve</b> or <b>Reject</b>. The map updates at once.</li>
+        </ol>
+        <p>You can’t edit a place’s details here. If something needs fixing, contact the person who manages the site.</p>
+      </div>
+      <div class="buttons" role="img" aria-label="The four buttons on a place: Approve, Reject, Back to waiting, Delete">
+        <span class="btn approve">Approve</span><span class="btn reject">Reject</span><span class="btn back">Back to waiting</span><span class="btn delete">Delete</span>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="text">
+        <h3>Reject or Delete?</h3>
+        <ul>
+          <li><b>Reject</b> takes it off the map but keeps it in the list. You can bring it back with <b>Back to waiting</b>.</li>
+          <li><b>Delete</b> removes it for good. The page asks you to confirm. Use it only for spam, tests and duplicates.</li>
+        </ul>
+      </div>
+      <div class="note">
+        <strong>Private details stay private</strong>
+        <p>Each place has a section “Only for the Goldin team”: who sent it and how to reach them. It never appears on the public map. Use it only to contact people about their submission.</p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="wrap">
+  <p>Chicago’s Asset Atlas · Goldin Institute · Screenshots from chicagoassetatlas.org, November 2026. The admin rows and buttons above are drawn examples.</p>
+</footer>
+</body>
+</html>
