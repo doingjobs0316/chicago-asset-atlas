@@ -98,6 +98,7 @@ main.wrap { padding-block: 40px 72px; display: grid; gap: 64px }
 .btn.reject { background: var(--no); color: #fff }
 .btn.back { border-color: var(--muted); color: var(--fg) }
 .btn.delete { border-color: var(--no); color: var(--no) }
+.btn.save { background: var(--orange); color: #fff }
 .note { padding: 16px 18px; border-radius: 12px; background: var(--surface); border: 1px solid var(--line); display: grid; gap: 6px }
 .note strong { font-weight: 800 }
 .signin { display: grid; grid-template-columns: max-content 1fr; gap: 6px 16px; margin: 0; padding: 16px 18px; background: var(--surface); border: 1px solid var(--line); border-radius: 12px }
@@ -232,7 +233,7 @@ footer.wrap { padding-block: 0 48px; color: var(--muted); font-size: 14px }
     <header>
       <span class="who">For the Goldin team</span>
       <h2>The admin page</h2>
-      <p>Where you check new places and approve or reject them. Please check every few days: anything people add is visible until you review it.</p>
+      <p>Where you check new places, approve or reject them, and keep every place up to date. Please check every few days: anything people add is visible until you review it.</p>
     </header>
 
     <div class="step">
@@ -270,13 +271,15 @@ footer.wrap { padding-block: 0 48px; color: var(--muted); font-size: 14px }
         <ol>
           <li>Click a yellow row to open it.</li>
           <li>Check it’s real, it’s in or near Chicago, and it’s a <b>public place</b> (never someone’s home).</li>
-          <li>Look at the pin on the map. Wrong spot? Drag the pin or click where the place is, then <b>Save the pin</b>.</li>
+          <li>Look at the pin on the map. Wrong spot? Drag the pin or click where the place is, then <b>Save changes</b>.</li>
           <li>Click <b>Approve</b> or <b>Reject</b>. The map updates at once.</li>
         </ol>
-        <p>You can’t edit a place’s details here. If something needs fixing, contact the person who manages the site.</p>
+        <p><b>Fix anything</b> right there: name, description, address, hours and more. Click <b>Save changes</b>, or <b>Undo changes</b> to go back to what was saved. An address you add shows on the map, and its pin is found for you.</p>
       </div>
-      <div class="buttons" role="img" aria-label="The four buttons on a place: Approve, Reject, Back to waiting, Delete">
+      <div class="buttons" role="img" aria-label="The buttons on a place: Approve, Reject, Back to waiting, Delete, then Save changes and Undo changes">
         <span class="btn approve">Approve</span><span class="btn reject">Reject</span><span class="btn back">Back to waiting</span><span class="btn delete">Delete</span>
+        <span style="flex-basis:100%;height:0"></span>
+        <span class="btn save">Save changes</span><span class="btn back">Undo changes</span>
       </div>
     </div>
 
